@@ -25,3 +25,6 @@ npm-debug.log*
 # Временные файлы
 *.tmp
 *.temp
+
+# Скрипты
+create-tattoo-project.sh
