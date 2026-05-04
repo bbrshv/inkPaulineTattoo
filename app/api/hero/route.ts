@@ -16,18 +16,22 @@ export async function GET(): Promise<NextResponse<HeroResponse>> {
   }
 
   // Ссылка на фон из Cloudinary
-  const heroBgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto/f_auto/v1777902076/mainBackground`;
   const fallbackVideoUrl = `https://res.cloudinary.com/${cloudName}/video/upload/q_auto/f_auto/v1777910645/mainBackground.mov`;
+  const heroBgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto/f_auto/v1777902076/mainBackground`;
 
-  let bgUrl = heroBgUrl;
+  let bgUrl = fallbackVideoUrl; // Сначала устанавливаем видео как фон
 
   try {
-    const response = await fetch(heroBgUrl, { method: "HEAD" });
+    const response = await fetch(fallbackVideoUrl, { method: "HEAD" });
     if (!response.ok) {
-      bgUrl = fallbackVideoUrl;
+      bgUrl = heroBgUrl; // Если видео недоступно, пробуем изображение
+      const imgResponse = await fetch(heroBgUrl, { method: "HEAD" });
+      if (!imgResponse.ok) {
+        bgUrl = ""; // Если оба недоступны, можно установить пустую строку или другое значение
+      }
     }
   } catch {
-    bgUrl = fallbackVideoUrl;
+    bgUrl = heroBgUrl; // Если произошла ошибка при получении видео, пробуем изображение
   }
 
   return NextResponse.json({ bgUrl });

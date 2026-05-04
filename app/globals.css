@@ -18,17 +18,15 @@ body {
   padding: 0 20px;
 }
 
+/* ========== HERO БЛОК ========== */
 .hero {
   position: relative;
-  height: 100vh;
-  min-height: 600px;
-  background-image: url("/hero-bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  z-index: 1;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .hero-overlay {
@@ -42,12 +40,13 @@ body {
     rgba(0, 0, 0, 0.7) 0%,
     rgba(0, 0, 0, 0.3) 100%
   );
+  z-index: 1;
 }
 
 .hero-content {
   position: relative;
   text-align: center;
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero-name {
@@ -82,9 +81,60 @@ body {
   box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
 }
 
+/* ========== ПАРАЛЛАКС ========== */
+.hero-parallax {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-media {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.05s linear;
+}
+
+.hero-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ========== ПОРТФОЛИО И ФОРМА ========== */
+.portfolio,
+.booking-form {
+  position: relative;
+  z-index: 2;
+  background-color: transparent;
+}
+
+.portfolio::before,
+.booking-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: -1;
+}
+
 .portfolio {
   padding: 80px 0;
-  background-color: #0a0a0a;
+}
+
+.booking-form {
+  padding: 80px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .section-title {
@@ -97,6 +147,7 @@ body {
   color: #e0e0e0;
 }
 
+/* ========== СЕТКА РАБОТ ========== */
 .works-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -128,12 +179,7 @@ body {
   color: #888;
 }
 
-.booking-form {
-  padding: 80px 0;
-  background: linear-gradient(135deg, #0f0f0f 0%, #0a0a0a 100%);
-  border-top: 1px solid #1a1a1a;
-}
-
+/* ========== ФОРМА ========== */
 .form {
   max-width: 600px;
   margin: 0 auto;
@@ -219,13 +265,28 @@ body {
   text-align: center;
 }
 
+/* ========== SNAP-SCROLL ========== */
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.hero,
+.portfolio,
+.booking-form {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.portfolio,
+.booking-form {
+  overflow-y: auto;
+}
+
+/* ========== АДАПТИВ ========== */
 @media (max-width: 768px) {
   .container {
     padding: 0 16px;
-  }
-
-  .hero {
-    background-attachment: scroll;
   }
 
   .hero-name {
@@ -243,10 +304,7 @@ body {
     margin-bottom: 2rem;
   }
 
-  .portfolio {
-    padding: 60px 0;
-  }
-
+  .portfolio,
   .booking-form {
     padding: 60px 0;
   }
@@ -263,32 +321,6 @@ body {
   }
 }
 
-/* Включаем snap-scroll для всей страницы */
-html {
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-}
-
-/* Каждый большой блок будет "прилипать" */
-.hero,
-.portfolio,
-.booking-form {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  height: 100vh; /* Каждый блок занимает весь экран */
-  overflow-y: auto; /* Если контент внутри блока длиннее — скроллится внутри */
-}
-
-/* Для блоков, где контент может не поместиться */
-.portfolio {
-  overflow-y: auto;
-}
-
-.booking-form {
-  overflow-y: auto;
-}
-
-/* На десктопе можно убрать принудительную высоту если мешает */
 @media (min-width: 1024px) {
   .hero,
   .portfolio,
@@ -296,34 +328,4 @@ html {
     height: auto;
     min-height: 100vh;
   }
-}
-.hero {
-  position: relative;
-  height: 100vh;
-  min-height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.hero-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.hero-bg-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
 }

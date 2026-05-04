@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import HeroParallax from "./components/HeroParallax";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -90,22 +91,14 @@ export default function Home() {
 
   return (
     <>
+      {heroBg && (
+        <HeroParallax
+          mediaUrl={heroBg}
+          isVideo={heroBg.match(/\.(mp4|webm|mov)$/i) ? true : false}
+        />
+      )}
+
       <section className="hero">
-        {heroBg && heroBg.match(/\.(mp4|webm|mov)$/i) ? (
-          <video
-            src={heroBg}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="hero-video"
-          />
-        ) : (
-          <div
-            className="hero-bg-image"
-            style={{ backgroundImage: heroBg ? `url(${heroBg})` : "none" }}
-          />
-        )}
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1 className="hero-name">inkpauline</h1>
