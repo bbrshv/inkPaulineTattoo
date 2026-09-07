@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Константа с демо-работами - инициализируется только один раз при загрузке модуля
+// Константа с демо-работами - заглушка, если Cloudinary не доступен
 const DEMO_WORKS = [
   {
     id: 1,
@@ -24,23 +24,32 @@ const DEMO_WORKS = [
   },
 ];
 
-// Функция для получения списка изображений из Cloudinary
+// Функция для получения списка изображений из Cloudinary (авторизованная)
 async function getImagesFromCloudinary(cloudName: string, prefix: string) {
-  const url = `https://res.cloudinary.com/${cloudName}/image/list/${prefix}.json`;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!apiKey || !apiSecret) {
+    console.error("Missing Cloudinary API credentials");
+    return [];
+  }
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?prefix=${encodeURIComponent(prefix)}&max_results=20`;
+  const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: { Authorization: `Basic ${auth}` },
+    });
     const data = await response.json();
-
     if (!data.resources) return [];
-
     return data.resources.map((resource: any) => ({
       id: resource.public_id,
       name: resource.public_id.split("/").pop(),
       url: resource.secure_url,
     }));
   } catch (error) {
-    console.error("Cloudinary error:", error);
+    console.error("Cloudinary Admin API error:", error);
     return [];
   }
 }
@@ -48,18 +57,21 @@ async function getImagesFromCloudinary(cloudName: string, prefix: string) {
 export async function GET() {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
-  // Если нет Cloudinary или в разработке — возвращаем заглушки
-  if (!cloudName /*|| process.env.NODE_ENV === "development"*/) {
+  // Если нет Cloudinary — возвращаем заглушки
+  if (!cloudName) {
     return NextResponse.json(DEMO_WORKS);
   }
 
   try {
-    const images = await getImagesFromCloudinary(cloudName, "myWorks");
+    const images = await getImagesFromCloudinary(
+      cloudName,
+      "myWorks/portfolio",
+    );
 
     // Фильтруем только portfolio_ файлы и сортируем
     const portfolioImages = images
-      .filter((img: any) => img.name.startsWith("portfolio_"))
-      .sort((a: any, b: any) => a.name.localeCompare(b.name));
+      .filter((img: any) => img.name && img.name.startsWith("portfolio_"))
+      .sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
 
     // Берём первые 4
     const works = portfolioImages
@@ -67,7 +79,7 @@ export async function GET() {
       .map((img: any, index: number) => ({
         id: index,
         src: img.url,
-        alt: img.name.replace(/\.(jpg|jpeg|png)$/i, ""),
+        alt: (img.name || "").replace(/\.(jpg|jpeg|png)$/i, ""),
       }));
 
     // Если нет фото в Cloudinary — заглушки
@@ -78,6 +90,6 @@ export async function GET() {
     return NextResponse.json(works);
   } catch (error) {
     console.error("Error:", error);
-    return NextResponse.json([]);
+    return NextResponse.json(DEMO_WORKS);
   }
 }
