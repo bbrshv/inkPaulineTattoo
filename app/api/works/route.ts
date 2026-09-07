@@ -34,7 +34,7 @@ async function getImagesFromCloudinary(cloudName: string, prefix: string) {
     return [];
   }
 
-  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?prefix=${encodeURIComponent(prefix)}&max_results=20`;
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?prefix=${encodeURIComponent(prefix)}&max_results=20&type=upload`;
   const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
 
   try {
