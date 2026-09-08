@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import HeroParallax from "./components/HeroParallax";
+import WorksCarousel from "./components/WorksCarousel";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -112,31 +112,7 @@ export default function Home() {
           {loading ? (
             <div className="loading">Загрузка работ...</div>
           ) : (
-            <div className="works-grid">
-              {works.map((work) => (
-                <div key={work.id} className="work-item">
-                  {work.src.match(/\.(mp4|webm|mov)$/i) ? (
-                    <video
-                      src={work.src}
-                      className="work-image"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    />
-                  ) : (
-                    <Image
-                      src={work.src}
-                      alt={work.alt}
-                      width={600}
-                      height={600}
-                      className="work-image"
-                      unoptimized
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+            <WorksCarousel works={works} />
           )}
         </div>
       </section>

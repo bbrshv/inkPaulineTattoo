@@ -147,7 +147,7 @@ body {
   color: #e0e0e0;
 }
 
-/* ========== СЕТКА РАБОТ ========== */
+/* ========== СЕТКА РАБОТ (не используется, но оставлена) ========== */
 .works-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -328,4 +328,114 @@ html {
     height: auto;
     min-height: 100vh;
   }
+}
+
+/* ========== КАРУСЕЛЬ РАБОТ ========== */
+.works-carousel {
+  padding: 20px 0 40px;
+}
+
+.swiper-slide {
+  height: auto;
+}
+
+.slide-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.work-slide {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 300px;
+  background: #2a2a2a;
+  transition: transform 0.3s ease;
+}
+
+.work-slide img,
+.work-slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Затемнение для последнего слайда (4-я работа) */
+.last-work .work-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.last-work:hover .work-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.overlay-text {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+  .overlay-text {
+    font-size: 1.2rem;
+  }
+}
+
+/* ========== СТРЕЛКИ SWIPER (ТЁМНЫЕ ПОЛУПРОЗРАЧНЫЕ) ========== */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.08);
+}
+
+/* Скрываем стрелки на мобилках */
+@media (max-width: 768px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none !important;
+  }
+}
+
+/* Точки пагинации */
+.swiper-pagination-bullet {
+  background: #999;
+}
+
+.swiper-pagination-bullet-active {
+  background: #333;
 }
