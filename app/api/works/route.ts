@@ -78,7 +78,11 @@ export async function GET() {
       .slice(0, 4)
       .map((img: any, index: number) => ({
         id: index,
-        src: img.url,
+        // Добавляем трансформации Cloudinary: ширина 600, высота 600, автокачество, автовыбор формата
+        src: img.url.replace(
+          "/upload/",
+          "/upload/w_600,h_600,c_fill,q_auto,f_auto/",
+        ),
         alt: (img.name || "").replace(/\.(jpg|jpeg|png)$/i, ""),
       }));
 
