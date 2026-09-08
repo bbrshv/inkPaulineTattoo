@@ -88,7 +88,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="page-wrapper">
       {heroBg && (
         <HeroParallax
           mediaUrl={heroBg}
@@ -106,92 +106,95 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="portfolio">
-        <div className="container">
-          <h2 className="section-title">Работы</h2>
-          {loading ? (
-            <div className="loading">Загрузка работ...</div>
-          ) : (
-            <WorksCarousel works={works} />
-          )}
-        </div>
-      </section>
-
-      <section ref={formRef} className="booking-form">
-        <div className="container">
-          <h2 className="section-title">Записаться</h2>
-          <form onSubmit={handleSubmit} className="form">
-            <div className="form-group">
-              <label htmlFor="name">Имя *</label>
-              <input
-                type="text"
-                id="name"
-                required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="contact">Telegram / Instagram / Phone *</label>
-              <input
-                type="text"
-                id="contact"
-                required
-                value={formData.contact}
-                onChange={(e) =>
-                  setFormData({ ...formData, contact: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="idea">Идея тату / Эскиз *</label>
-              <textarea
-                id="idea"
-                rows={4}
-                required
-                value={formData.idea}
-                onChange={(e) =>
-                  setFormData({ ...formData, idea: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="files">Референсы (несколько файлов)</label>
-              <input
-                type="file"
-                id="files"
-                multiple
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="submit-btn"
-            >
-              {isSubmitting ? "Отправка..." : "Отправить заявку"}
-            </button>
-
-            {submitStatus === "success" && (
-              <p className="success-message">
-                Заявка отправлена! Я свяжусь с вами в ближайшее время.
-              </p>
+      {/* Общий контейнер для работ и формы с тёмным полупрозрачным фоном */}
+      <div className="content-wrapper">
+        <section className="portfolio">
+          <div className="container">
+            <h2 className="section-title">Работы</h2>
+            {loading ? (
+              <div className="loading">Загрузка работ...</div>
+            ) : (
+              <WorksCarousel works={works} />
             )}
-            {submitStatus === "error" && (
-              <p className="error-message">
-                Ошибка при отправке. Попробуйте позже.
-              </p>
-            )}
-          </form>
-        </div>
-      </section>
-    </>
+          </div>
+        </section>
+
+        <section ref={formRef} className="booking-form">
+          <div className="container">
+            <h2 className="section-title">Записаться</h2>
+            <form onSubmit={handleSubmit} className="form">
+              <div className="form-group">
+                <label htmlFor="name">Имя *</label>
+                <input
+                  type="text"
+                  id="name"
+                  required
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="contact">Telegram / Instagram / Phone *</label>
+                <input
+                  type="text"
+                  id="contact"
+                  required
+                  value={formData.contact}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contact: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="idea">Идея тату / Эскиз *</label>
+                <textarea
+                  id="idea"
+                  rows={4}
+                  required
+                  value={formData.idea}
+                  onChange={(e) =>
+                    setFormData({ ...formData, idea: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="files">Референсы (несколько файлов)</label>
+                <input
+                  type="file"
+                  id="files"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="submit-btn"
+              >
+                {isSubmitting ? "Отправка..." : "Отправить заявку"}
+              </button>
+
+              {submitStatus === "success" && (
+                <p className="success-message">
+                  Заявка отправлена! Я свяжусь с вами в ближайшее время.
+                </p>
+              )}
+              {submitStatus === "error" && (
+                <p className="error-message">
+                  Ошибка при отправке. Попробуйте позже.
+                </p>
+              )}
+            </form>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }
