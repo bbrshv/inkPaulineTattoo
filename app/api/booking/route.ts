@@ -3,6 +3,8 @@ import { writeFile, mkdir, readFile } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
 
+const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 МБ
+
 // --- Telegram отправка текста ---
 async function sendTelegramMessage(text: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -47,7 +49,6 @@ async function sendTelegramFile(filePath: string, fileName: string) {
     const method = isImage ? "sendPhoto" : "sendDocument";
     const fieldName = isImage ? "photo" : "document";
 
-    // Добавляем файл в FormData
     const blob = new Blob([fileBuffer]);
     formData.append(fieldName, blob, fileName);
 
@@ -56,7 +57,6 @@ async function sendTelegramFile(filePath: string, fileName: string) {
       {
         method: "POST",
         body: formData,
-        // Заголовки автоматически устанавливаются fetch для FormData
       },
     );
 
@@ -80,6 +80,17 @@ export async function POST(request: Request) {
     const idea = formData.get("idea") as string;
     const files = formData.getAll("files") as File[];
     const timestamp = Date.now();
+
+    // Проверка общего размера всех файлов
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      return NextResponse.json(
+        {
+          message: `Общий размер файлов превышает 100 МБ. Пожалуйста, уменьшите количество или размер файлов.`,
+        },
+        { status: 413 }, // 413 Request Entity Too Large
+      );
+    }
 
     // Сохранение на сервере
     const uploadDir = path.join(

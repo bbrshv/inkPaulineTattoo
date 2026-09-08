@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import HeroParallax from "./components/HeroParallax";
 import WorksCarousel from "./components/WorksCarousel";
 
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 МБ
+
 export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
@@ -13,13 +15,13 @@ export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [works, setWorks] = useState<
     { id: number; src: string; alt: string }[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [heroBg, setHeroBg] = useState("");
   const formRef = useRef<HTMLElement | null>(null);
-  // +++ Реф для самой формы (чтобы сбросить поля после отправки)
   const formElementRef = useRef<HTMLFormElement>(null);
 
   const fetchWorks = async () => {
@@ -50,15 +52,49 @@ export default function Home() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
+    setFileError(null);
+    if (!e.target.files) return;
+
+    const selectedFiles = Array.from(e.target.files);
+
+    // Проверка каждого файла
+    const oversized = selectedFiles.find((file) => file.size > MAX_FILE_SIZE);
+    if (oversized) {
+      setFileError(
+        `Файл "${oversized.name}" превышает допустимый размер (100 МБ). Пожалуйста, выберите меньший файл.`,
+      );
+      e.target.value = "";
+      return;
     }
+
+    // Проверка общего размера
+    const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_FILE_SIZE) {
+      setFileError(
+        `Общий размер файлов превышает 100 МБ. Пожалуйста, уменьшите количество или размер файлов.`,
+      );
+      e.target.value = "";
+      return;
+    }
+
+    setFiles(selectedFiles);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
+    setFileError(null);
+
+    // Проверка общего размера перед отправкой
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_FILE_SIZE) {
+      setFileError(
+        `Общий размер файлов превышает 100 МБ. Пожалуйста, удалите некоторые файлы.`,
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
@@ -90,7 +126,6 @@ export default function Home() {
         setSubmitStatus("success");
         setFormData({ name: "", contact: "", idea: "" });
         setFiles([]);
-        // Сбрасываем форму через ref
         formElementRef.current?.reset();
       } else {
         console.error("Ошибка от сервера:", responseData || responseText);
@@ -187,6 +222,7 @@ export default function Home() {
                   accept="image/*"
                   onChange={handleFileChange}
                 />
+                {fileError && <p className="file-error-message">{fileError}</p>}
               </div>
 
               <button
