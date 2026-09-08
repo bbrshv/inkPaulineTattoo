@@ -40,7 +40,7 @@ export default function WorksCarousel({ works }: { works: Work[] }) {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <Link href="/gallery" className="slide-link">
+            <Link href="/gallery" prefetch className="slide-link">
               <div className={`work-slide ${slide.isLast ? "last-work" : ""}`}>
                 {slide.src.match(/\.(mp4|webm|mov)$/i) ? (
                   <video src={slide.src} autoPlay muted loop playsInline />
