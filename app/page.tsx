@@ -33,7 +33,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchWorks();
   }, []);
 
@@ -81,7 +80,6 @@ export default function Home() {
       } else {
         setSubmitStatus("error");
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setSubmitStatus("error");
     } finally {
