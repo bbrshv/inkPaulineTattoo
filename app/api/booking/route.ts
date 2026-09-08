@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         {
           message: `Общий размер файлов превышает 100 МБ. Пожалуйста, уменьшите количество или размер файлов.`,
         },
-        { status: 413 }, // 413 Request Entity Too Large
+        { status: 413 },
       );
     }
 
@@ -130,11 +130,17 @@ export async function POST(request: Request) {
 🕒 Время: ${new Date(timestamp).toLocaleString("ru-RU")}
     `;
 
-    sendTelegramMessage(messageText);
+    // Явно ждём отправку текста
+    await sendTelegramMessage(messageText);
 
-    for (const filePath of savedPaths) {
-      const fileName = path.basename(filePath);
-      sendTelegramFile(filePath, fileName);
+    // Отправляем все файлы параллельно и ждём их завершения
+    if (savedPaths.length > 0) {
+      await Promise.all(
+        savedPaths.map(async (filePath) => {
+          const fileName = path.basename(filePath);
+          await sendTelegramFile(filePath, fileName);
+        }),
+      );
     }
 
     return NextResponse.json(
