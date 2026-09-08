@@ -19,6 +19,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [heroBg, setHeroBg] = useState("");
   const formRef = useRef<HTMLElement | null>(null);
+  // +++ Реф для самой формы (чтобы сбросить поля после отправки)
+  const formElementRef = useRef<HTMLFormElement>(null);
 
   const fetchWorks = async () => {
     try {
@@ -72,15 +74,30 @@ export default function Home() {
         body: formDataToSend,
       });
 
+      console.log("response.status:", response.status);
+      console.log("response.ok:", response.ok);
+      const responseText = await response.text();
+      console.log("response body:", responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Не удалось распарсить JSON:", parseError);
+      }
+
       if (response.ok) {
         setSubmitStatus("success");
         setFormData({ name: "", contact: "", idea: "" });
         setFiles([]);
-        e.currentTarget.reset();
+        // Сбрасываем форму через ref
+        formElementRef.current?.reset();
       } else {
+        console.error("Ошибка от сервера:", responseData || responseText);
         setSubmitStatus("error");
       }
     } catch (error) {
+      console.error("Сетевая ошибка:", error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -106,7 +123,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Общий контейнер для работ и формы с тёмным полупрозрачным фоном */}
       <div className="content-wrapper">
         <section className="portfolio">
           <div className="container">
@@ -122,7 +138,7 @@ export default function Home() {
         <section ref={formRef} className="booking-form">
           <div className="container">
             <h2 className="section-title">Записаться</h2>
-            <form onSubmit={handleSubmit} className="form">
+            <form onSubmit={handleSubmit} className="form" ref={formElementRef}>
               <div className="form-group">
                 <label htmlFor="name">Имя *</label>
                 <input

@@ -583,3 +583,15 @@ html {
     margin-bottom: 8px;
   }
 }
+/* Отключаем scroll-snap на мобилках, чтобы убрать тряску при фокусе на форме */
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: none !important;
+  }
+  .hero,
+  .portfolio,
+  .booking-form {
+    scroll-snap-align: none !important;
+    scroll-snap-stop: normal !important;
+  }
+}
