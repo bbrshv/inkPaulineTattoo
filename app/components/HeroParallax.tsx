@@ -1,30 +1,62 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 interface HeroParallaxProps {
-  mediaUrl: string;
-  isVideo: boolean;
+  videoUrl: string;
+  imageUrl: string;
+  posterUrl: string;
+  /** Колбэк: вызывается, когда видео готово к проигрыванию (или когда видео нет). */
+  onVideoReady?: () => void;
 }
 
-export default function HeroParallax({ mediaUrl, isVideo }: HeroParallaxProps) {
-  // Убрали всё, что связано с параллаксом и скроллом.
-  // Видео/картинка просто отображаются на всю высоту родителя без трансформаций.
+export default function HeroParallax({
+  videoUrl,
+  imageUrl,
+  posterUrl,
+  onVideoReady,
+}: HeroParallaxProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
+
+  // Если видео нет — сразу сигналим родителю, что «готово» (нечего ждать).
+  // Лоза вырастет сразу, это ожидаемое поведение для fallback-картинки.
+  useEffect(() => {
+    if (!videoUrl) {
+      onVideoReady?.();
+    }
+  }, [videoUrl, onVideoReady]);
+
+  // Статичная подложка: постер, если видео есть; иначе — картинка.
+  // Всегда под видео — переход не даёт «чёрной вспышки».
+  const backgroundUrl = videoUrl ? posterUrl : imageUrl;
 
   return (
     <div className="hero-parallax">
-      {isVideo ? (
+      <div
+        className="hero-media hero-image"
+        style={{ backgroundImage: `url(${backgroundUrl})` }}
+      />
+
+      {videoUrl && (
         <video
-          src={mediaUrl}
+          ref={videoRef}
+          src={videoUrl}
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
+          onCanPlay={() => {
+            setVideoReady(true);
+            onVideoReady?.();
+          }}
           className="hero-media"
-          style={{ objectFit: "cover" }}
-        />
-      ) : (
-        <div
-          className="hero-media hero-image"
-          style={{ backgroundImage: `url(${mediaUrl})` }}
+          style={{
+            objectFit: "cover",
+            opacity: videoReady ? 1 : 0,
+            transition: "opacity 0.6s ease-in",
+          }}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import HeroParallax from "./components/HeroParallax";
 import WorksCarousel from "./components/WorksCarousel";
 import Vine from "./components/Vine";
@@ -21,7 +21,10 @@ export default function Home() {
     { id: number; src: string; alt: string }[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [heroBg, setHeroBg] = useState("");
+  const [heroVideoUrl, setHeroVideoUrl] = useState("");
+  const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [heroPosterUrl, setHeroPosterUrl] = useState("");
+  const [vineStart, setVineStart] = useState(false);
   const formRef = useRef<HTMLElement | null>(null);
   const formElementRef = useRef<HTMLFormElement>(null);
 
@@ -44,8 +47,17 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/hero")
       .then((res) => res.json())
-      .then((data) => setHeroBg(data.bgUrl))
+      .then((data) => {
+        setHeroVideoUrl(data.videoUrl || "");
+        setHeroImageUrl(data.imageUrl || "");
+        setHeroPosterUrl(data.posterUrl || "");
+      })
       .catch((err) => console.error("Ошибка загрузки фона:", err));
+  }, []);
+
+  // Мемоизируем, чтобы HeroParallax не дёргал useEffect на каждый ререндер.
+  const handleVideoReady = useCallback(() => {
+    setVineStart(true);
   }, []);
 
   const scrollToForm = () => {
@@ -140,19 +152,24 @@ export default function Home() {
     }
   };
 
+  // Показываем HeroParallax, если есть что показывать: постер, картинку или видео
+  const hasHeroBackground = heroVideoUrl || heroImageUrl || heroPosterUrl;
+
   return (
     <div className="page-wrapper">
-      {heroBg && (
+      {hasHeroBackground && (
         <HeroParallax
-          mediaUrl={heroBg}
-          isVideo={heroBg.match(/\.(mp4|webm|mov)$/i) ? true : false}
+          videoUrl={heroVideoUrl}
+          imageUrl={heroImageUrl}
+          posterUrl={heroPosterUrl}
+          onVideoReady={handleVideoReady}
         />
       )}
 
       <section className="hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <Vine />
+          <Vine start={vineStart} />
           <h1 className="hero-name">inkpauline</h1>
           <button onClick={scrollToForm} className="cta-button">
             Записаться
