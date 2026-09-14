@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import HeroParallax from "./components/HeroParallax";
 import WorksCarousel from "./components/WorksCarousel";
+import Vine from "./components/Vine";
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 МБ
 
@@ -151,6 +152,7 @@ export default function Home() {
       <section className="hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
+          <Vine />
           <h1 className="hero-name">inkpauline</h1>
           <button onClick={scrollToForm} className="cta-button">
             Записаться
